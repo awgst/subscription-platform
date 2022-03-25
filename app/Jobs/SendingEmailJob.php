@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Mail\NewPost;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,5 +38,7 @@ class SendingEmailJob implements ShouldQueue
     {
         Log::info(['Send email to '.$this->email]);
         Log::info(['New Post', $this->post]);
+        // Forgot to send email :)
+        Mail::to($this->email)->send(new NewPost($this->post));
     }
 }
