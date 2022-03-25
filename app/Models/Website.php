@@ -10,4 +10,9 @@ class Website extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'websites_users', 'website_id', 'user_id');
+    }
 }

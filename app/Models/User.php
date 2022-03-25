@@ -41,4 +41,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Subscribed websites
+    public function websites()
+    {
+        return $this->belongsToMany(Website::class, 'websites_users', 'website_id', 'user_id');
+    }
 }
