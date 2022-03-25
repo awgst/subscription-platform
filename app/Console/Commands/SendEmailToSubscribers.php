@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Jobs\SendingEmailJob;
+use App\Models\Post;
 use App\Models\Website;
 use Illuminate\Console\Command;
 
@@ -13,7 +14,7 @@ class SendEmailToSubscribers extends Command
      *
      * @var string
      */
-    protected $signature = 'send:email-subscriber {websiteId}';
+    protected $signature = 'send:email-subscriber {websiteId}{postId}';
 
     /**
      * The console command description.
@@ -39,12 +40,14 @@ class SendEmailToSubscribers extends Command
      */
     public function handle()
     {
-        $websiteId = $this->arguments('websiteId');
-        $website = Website::with(['subscribers'])->find($websiteId)->first();
+        $websiteId = $this->arguments('websiteId')['websiteId'];
+        $postId = $this->arguments('postId')['postId'];
+        $website = Website::with(['subscribers'])->find($websiteId);
+        $post = Post::select(['title', 'description'])->find($postId)->toArray();
         $subscribers = $website->subscribers;
         foreach ($subscribers ?? [] as $subscriber) {
             if ($subscriber->email) {
-                SendingEmailJob::dispatch($subscriber->email)->onQueue('sendEmail');
+                SendingEmailJob::dispatch($subscriber->email, $post)->onQueue('sendEmail');
             }
         }
     }

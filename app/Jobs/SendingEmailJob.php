@@ -16,14 +16,16 @@ class SendingEmailJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $email;
+    private $post;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($email)
+    public function __construct(string $email, $post)
     {
         $this->email = $email;
+        $this->post = $post;
     }
 
     /**
@@ -34,5 +36,6 @@ class SendingEmailJob implements ShouldQueue
     public function handle()
     {
         Log::info(['Send email to '.$this->email]);
+        Log::info(['New Post', $this->post]);
     }
 }
