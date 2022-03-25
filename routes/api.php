@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,5 +20,8 @@ Route::group(['prefix' => 'website'], function (){
         return response()->json(['message'=>'test']);
     });
     Route::post('{websiteId}/post', [PostController::class, 'store']);
+});
 
+Route::group(['prefix' => 'user'], function (){
+    Route::post('{id}/subscribe/{websiteId}', [UserController::class, 'subscribe']);
 });
