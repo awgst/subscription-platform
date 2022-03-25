@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Jobs\SendingEmailJob;
 use App\Models\Post;
 use App\Models\Website;
+use App\Repositories\PostRepository;
+use App\Repositories\WebsiteRepository;
 use Illuminate\Console\Command;
 
 class SendEmailToSubscribers extends Command
@@ -42,8 +44,8 @@ class SendEmailToSubscribers extends Command
     {
         $websiteId = $this->arguments('websiteId')['websiteId'];
         $postId = $this->arguments('postId')['postId'];
-        $website = Website::with(['subscribers'])->find($websiteId);
-        $post = Post::select(['title', 'description'])->find($postId)->toArray();
+        $website = resolve(WebsiteRepository::class)->find($websiteId, ['subscribers']);
+        $post = resolve(PostRepository::class)->select(['title', 'description'])->find($postId)->toArray();
         $subscribers = $website->subscribers;
         foreach ($subscribers ?? [] as $subscriber) {
             if ($subscriber->email) {

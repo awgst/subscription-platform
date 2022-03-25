@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use App\Models\Website;
+use App\Repositories\PostRepository;
+use App\Repositories\WebsiteRepository;
 use App\Services\SendEmailToSubscriber;
 use Exception;
 use Illuminate\Http\Request;
@@ -11,14 +12,22 @@ use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
+    private $post;
+    public function __construct(PostRepository $post)
+    {
+        $this->post = $post;    
+    }
+
     public function store(Request $request, $websiteId)
     {
         try {
-            $website = Website::find($websiteId);
+            // Check Website
+            $website = resolve(WebsiteRepository::class)->find($websiteId);
             if (is_null($website)) {
                 throw new Exception('Website not found');
             }
 
+            // Validation
             $validator = Validator::make($request->all(), [
                 'title' => 'required',
                 'description' => 'required'
@@ -32,8 +41,9 @@ class PostController extends Controller
             }
             $data = $validator->validated();
             $data['website_id'] = $websiteId;
-            $post = Post::create($data);
-            // $this->afterCreate($post);
+
+            // Create post and send email to subscriber
+            $post = $this->post->store($data);
             (new SendEmailToSubscriber($post))->send();
             $message = 'Post successfully created';
         } catch (Exception $e) {
@@ -41,10 +51,5 @@ class PostController extends Controller
         }
 
         return response()->json(['message' => $message], 200);
-    }
-
-    private function afterCreate($post)
-    {
-        // Artisan::call('send:email-subscriber', ['websiteId' => $post->website_id, 'postId' => $post->id]);
     }
 }
