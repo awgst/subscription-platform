@@ -15,4 +15,9 @@ class Website extends Model
     {
         return $this->belongsToMany(User::class, 'websites_users', 'website_id', 'user_id');
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'website_id', 'id');
+    }
 }
