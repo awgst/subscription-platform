@@ -11,7 +11,7 @@ class Website extends Model
 
     protected $guarded = ['id'];
 
-    public function users()
+    public function subscribers()
     {
         return $this->belongsToMany(User::class, 'websites_users', 'website_id', 'user_id');
     }
